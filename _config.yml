@@ -1,7 +1,1 @@
 theme: jekyll-theme-midnight
-#Remove header
-name: CTF-writeups
-title: null
-#Remove view on github
-github:
-  is_project_page: false
