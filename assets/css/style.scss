@@ -13,6 +13,15 @@ section {
     max-width: 1200px;
 }
 
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
 @media print, screen and (max-width: 480px) {
     section {
       margin-top: 0px;
