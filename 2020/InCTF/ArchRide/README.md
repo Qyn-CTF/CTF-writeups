@@ -15,9 +15,9 @@ Checking some random functions, we can see some function which looks like the ma
 So basically, we need to satisfy 3 conditions.  
 
 1. Our key is 14 characters (0xe - the null byte or line terminator)  
-1. Some huge if case with a lot of XOR operations:
+1. Some huge if case with a lot of XOR operations:  
 ![](./2.png)  
-1. A function which is really similair to the other if case:
+1. A function which is really similair to the other if case:  
 ![](./3.png)  
 
 I decided I to just write some code to satisify those 2 conditions:
