@@ -1,12 +1,12 @@
-### ArchRide
+# ArchRide
 
-#### First looks
+## First looks
 
 When running file on the provided: `surprise` file. We find out its bzip2 and after decompressing it and again running `file` on it we can see it's a 64 bit `x86` binary.  
 After opening it, it asks for a key: `Enter Key:` and after ending some random characters it says it needs a better key: `Need a better key :(`  
 However, we notice that the file is rather large: `8200kb`  
 
-#### Reversing
+## Reversing
 
 After finding out that we had to enter some key, I decided to load the binary up in `Ghidra` (It's free and opensource)  
 Thankfully, the binary is small and just has a few functions, though the binary is stripped.  
@@ -85,6 +85,6 @@ Thankfully, in `BZIP2` there is an `End Of Stream` magic, which is `0x1772453850
 
 Note: _I made a small mistake in the xor decryption, by just implementing a normal alorithm, but noticed the `0xd` in the decryption function after some debugging. Initially I just implemented it as `len(key)` which is 14 instead of 13._
 
-#### Result
+## Result
 After running the `solve.py` for some time it crashes and we can execute the final `./surprise` which results in the flag:  
 `inctf{x32_x64_ARM_MAC_powerPC_4rch_maz3_6745}`

