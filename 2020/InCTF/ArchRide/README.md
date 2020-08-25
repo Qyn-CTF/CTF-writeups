@@ -78,7 +78,7 @@ print(chr(s.model().eval(x0).as_long()) + chr(s.model().eval(x1).as_long())  + c
 Which resulted in `JCE1aWJApiDO5K` and after entering as the key, it creates a new binary (Also decompressed with gzip2), but with a different architecture: `32 bit x86`. Luckily the xor conditions stayed the same (except for the final values), so all that had to be done was write some code which retrieves the two xor keys and the new binary.  
 To extract the xor keys, I just manually looked up all the locations of the xor keys in the binary as they were constant for each different architecture.  
 Originally, I wanted to get the new binary by just entering the key into the process, but due to some issues with qemu (powerpc64..), it didn't work at all and I decided to just decrypt the new binary by itself.  
-So I had to get back to Ghidra and findout how the decryption worked:
+So I had to get back to Ghidra and findout how the decryption worked:  
 ![](./4.png)  
 This is just a simple XOR decryption which can be easily implemented.  
 Thankfully, in `BZIP2` there is an `End Of Stream` magic, which is `0x177245385090` ([Wikipedia](https://en.wikipedia.org/wiki/Bzip2#File_format)) and so it stops at that point and doesn't care about the garbage after it. This allows us to just simply find the start of each encoded blob and we don't have to deal with the end. So we just cut everything before the start of the blob and pass it into the decrypt function.  
