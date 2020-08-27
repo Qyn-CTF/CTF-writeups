@@ -5,7 +5,8 @@ Description:
 .NET is great, especially because of all its weird features.
 ```
 
-*Note: Windows defender didn't like the challenge*
+*Note: Windows defender didn't like the challenge*:  
+![](./8.png)  
 
 ## First looks
 When first starting the challenge, we are provided with some input field with a button  
@@ -48,13 +49,16 @@ After a bit more looking around in dnSpy (and debugging), I found this function:
 Here it uses the `0Harmony.dll` to prefix certain methods, so another function will be called first instead of the original.  
 The first function I saw already looked quite weird:  
 ![](./5.png)  
-At this point I was a bit lost and ended up opening the binary in ida and with the given file offset from dnSpy of those weird functions I was able to disassemble them. However, I didn't really know what to do and with the offset in ida I was able to debug it in `x86dbg`, here I found that the `NativeGRUNDTAL_NORRVIKEN` function is basically the same as the original `GRUNDTAL_NORRVIKEN` function.  
+At this point I was a bit lost and ended up opening the binary in ida and with the given file offset from dnSpy:  
+![](./9.png)  
+of those weird functions I was able to disassemble them. However, I didn't really know what to do and with the offset in ida I was able to debug it in `x32dbg`, I simply opened the binary in `x32dbg` and put a breakpoint at the start of one of those functions (`Using cntrl + shift + g for file offset`), here I found that the `NativeGRUNDTAL_NORRVIKEN` function is basically the same as the original `GRUNDTAL_NORRVIKEN` function.  
 At this point I was completely stuck and was just looking around at the `FYRKANTIGImpl` function in ida, but it made some weird calls, which I didn't understand, such as a jump to `0x6000051`.  
-It wasn't until a team member messaged me asking if I could use some help. It was at that moment that these jumps to `0x6000051` for example were actually just calls to the `.net` code:  
+It wasn't until a team member messaged me asking if I could use some help. It was at that moment that these jumps to `0x6000051` for example were actually just calls to the `.net` code to functions with the specified token:  
 ![](./6.png)  
-And after a bit of debugging and looking around in ida, I found some XOR function and I quickly found the key:  
+And after a bit of debugging and looking around in ida and ghidra, I found some XOR function and I quickly found the key:  
 ![](./7.png)  
-After this I again got a bit stuck, but found out about two other functions which modified the input, the same team member mentioned that first one was probably some random shuffling algorithm, and the last function was really simple to reverse as it just swapped characters in a for loop, being incremented by 3, but not taking the 27th and 28th character pseudo code:
+After this I again got a bit stuck, but found out about two other functions which modified the input by simply following the `FYRKANTIGImpl` function and it's nested function calls in `x32dbg`.  
+The same team member mentioned that first one was probably some random shuffling algorithm, and the last function was really simple to reverse as it just swapped characters in a for loop, being incremented by 3, but not taking the 27th and 28th character pseudo code:
 ```csharp
 for (int i = 0; i < flag.length; i+=3) {
     if (i != 27 && i != 28) {
@@ -64,7 +68,18 @@ for (int i = 0; i < flag.length; i+=3) {
     }
 }
 ```
-For the shuffling function, we came up with the idea to create a simple dictionary as the result was always the same (Because the same seed was used...). I created this by comparing the before and after using `x32dbg` and created a script to create a dictionary, after some more outputs (because of duplicate entries), we got a full dictionary.
+For the shuffling function, we came up with the idea to create a simple dictionary as the result was always the same (Because the same seed was used...). I created this by comparing the before and after using `x32dbg`:
+Before:
+```
+01120490  3E 02 1E 1E 3A 26 16 00 25 12 28 1A 18 09 11 2D  >...:&..%.(....-  
+011204A0  2F 0F 1E 04 0B 06 1F 2A 06 3D 19 10 3F 1C 00 00  /......*.=..?...  
+```
+After:
+```
+01120490  18 1E 3A 06 3E 1F 2D 1A 2A 26 10 28 04 16 0B 2F  ..:.>.-.*&.(.../  
+011204A0  12 06 02 25 00 0F 19 3D 09 1E 1E 11 3F 1C 00 00  ...%...=....?...  
+```
+with this I created a script to create a dictionary with the given output and after some more tries (because of duplicate entries), we got a full dictionary.  
 Now we have everything to solve the challenge, we only need to implement in in reverse, so first the `z3 solve -> swap -> reverse shuffle -> xor -> encode base64`.  
 I originally created the solver in C# (except for the z3 stuff), because I could simply copy methods from dnSpy, but I made some mistake with references and it took me some time to figure out what I was doing wrong, it turned out I forgot to clone the object, but instead created a reference to the object, so I lost the original one..  
 The final solver is `solve2.py`  
