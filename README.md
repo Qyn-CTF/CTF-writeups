@@ -1,5 +1,5 @@
 - ## 2020
-    - ### GoogleCTF
+    - ### r2CON
         - [radarelicensechecker](2020/r2CON/radarelicensechecker)
 
     - ### GoogleCTF
