@@ -18,7 +18,7 @@ Decoding license data...
 
 ERROR: decryption error in block 0!
 ```
-So clearly there's something going on and I decided to change the first A into an `r` because that's what the flag looks like, and we're lucky it failed at block `0` instead of block `1`:
+So clearly there's something going on and I decided to change the first A into an `r` because that's what the flag starts with and we're lucky since it failed at block `0` instead of block `1`:
 ```
 ❯ .\radarelicensechecker.exe rAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Radare License Checker
@@ -54,7 +54,7 @@ Decoding license data...
 
 ERROR: decryption error in block 3!
 ```
-Now, it prints this without sleeping, so now we only need to bruteforce the right key, since we know whether out key is correct because of the `ERROR: decryption error in block 3!`.  
+Now, it prints this without sleeping, so now we only need to bruteforce the right key, since we know whether our key is correct because of the `ERROR: decryption error in block 3!`.  
 So after writing some really simple code in `solve.py` we find the correct license key / flag in around 10 seconds:
 ```
 ❯ python .\solve.py
