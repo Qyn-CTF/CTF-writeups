@@ -1,5 +1,8 @@
 - ## 2020
     - ### GoogleCTF
+        - [radarelicensechecker](2020/r2CON/radarelicensechecker)
+
+    - ### GoogleCTF
         - [.net](2020/Google/dotnet)
         
     - ### InCTF

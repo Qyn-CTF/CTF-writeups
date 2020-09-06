@@ -66,10 +66,11 @@ MMMMMMMMMMMMMMMMMM
 
 ERROR: decryption error in block 3!
 ```
-Now, it prints this without sleeping, so now we only need to bruteforce the right key, since we know if it failed because of the `ERROR: decryption error in block 3!`.  
+Now, it prints this without sleeping, so now we only need to bruteforce the right key, since we know whether out key is correct because of the `ERROR: decryption error in block 3!`.  
 So after writing some really simple code in `solve.py` we find the correct license key / flag in around 10 seconds:
 ```
 ❯ python .\solve.py
 [34] FOUND FLAG: r2con{D0nt_Do_Crypt0_At_Hom3_Kids}
 ```
+Also it prints some ascii art when running the exe with the flag  
 `r2con{D0nt_Do_Crypt0_At_Hom3_Kids}`
