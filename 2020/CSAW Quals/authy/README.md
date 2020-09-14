@@ -35,7 +35,7 @@ hasher = hashlib.sha1()
 hasher.update(SECRET + infostr)
 return "Successfully added {}:{}\n".format(identifier, hasher.hexdigest())
 ```
-Here we can see that the `sha1` hash is taken of `SECRET|infostr`, where `infostr` is the `form` like data (`sha1(SECRET || infostr)`). This is just a simple `length extension attack`.  
+Here we can see that the `sha1` hash is taken of `SECRET|infostr`, where `infostr` is the `form` like data (`sha1(SECRET || infostr)`). This is just a simple `length extension attack` (Not all hash types are vulnerable against this).  
 Continuing to the `/view` endpoint, we see it takes the `id` (`identifier`) and the `hash` in order to verify it was right:  
 ```python
 identifier = base64.b64decode(info["id"]).decode()
@@ -118,10 +118,16 @@ inputHash = "2dff57726cd588741d73c554d0eb4e1ebb0d9b32"
 for i in range(2, 20):
     try:
         print(f"Doing {i}/19")
-        result = hashpumpy.hashpump(inputHash, inputId, '&admin=True&entrynum=7&access_sensitive=True', i)
-        resultIdentifier = b64encode(result[1].decode("ISO-8859-1").encode('unicode-escape')).decode()
+        result = hashpumpy.hashpump(
+            inputHash, inputId, '&admin=True&entrynum=7&access_sensitive=True', i)
+            
+        resultIdentifier = b64encode(result[1].decode(
+            "ISO-8859-1").encode('unicode-escape')).decode()
 
-        r = requests.post('http://crypto.chal.csaw.io:5003/view', data={'id': resultIdentifier, 'integrity':result[0]}, headers={"Content-Type":"application/x-www-form-urlencoded"})
+        r = requests.post('http://crypto.chal.csaw.io:5003/view',
+                          data={'id': resultIdentifier,
+                                'integrity': result[0]},
+                          headers={"Content-Type": "application/x-www-form-urlencoded"})
 
         if "disobeyed our rules" in r.text:
             print(r.text)
