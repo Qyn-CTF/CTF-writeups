@@ -18,12 +18,12 @@ We've given the code a cursory glance... the check_cheat_codes function sounds h
 
 You must flip the switch in the bottom right to "LIVE" to get the flag. This will disable the debugger when running
 ```
-And when going to the python window we can start the application.  
-Playing around a bit, we find that it's obviously tetris and because of the previous hint we need to somehow enable the cheat codes...
+Also when going to the python window we can start the application.  
+Playing around a bit, we find that it's obviously tetris and because of the previous hint we need to somehow enable the cheat codes (Confirmed by hovering over the little flags on the bottem right)...
 
 ## Reversing
-When we simply check the `check_cheat_codes` function in the disassembler, we get some nice and *understandable* Assembly:
-```asm
+When we simply check the `check_cheat_codes` function in the disassembler, we get some nice and *understandable* `assembly`:
+```assembly
 0x402718:  push    rbp
 0x402719:  mov     rbp, rsp
 0x40271c:  sub     rsp, 0x10
@@ -48,9 +48,9 @@ When we simply check the `check_cheat_codes` function in the disassembler, we ge
 0x40275b:  leave   
 0x40275c:  retn    
 ```
-We can already notice the for loop, but opening it in the graph view confirms this:  
+We can already notice the `for` loop, but opening it in the graph view confirms this:  
 ![](./1.png)  
-Based on this we can also see that basically, `sub_402554` or `sub_402554` needs to return `true` in order to continue the loop.  
+Based on this we can also see that, either `sub_402554` or `sub_402554` needs to return `true` in order to continue the loop.  
 
 ### sub_402554
 ```asm
@@ -143,10 +143,11 @@ I decided to just run `start` and `vmmap` afterwards:
 0x400000-0x405000 rwx csaw2020_blox
 0x7ffffffde000-0x7ffffffff000 rw- [stack]
 ```
-Using the `x` command we can leak the binary: `x/20480x 0x400000`, after this (and reversing the bytesorder), we have the binary and we can load it up in our disassembler of choice, I chose Ghidra, since it's free, but ida works just as good. Since we don't have any symbols, we need to rename it all, but we can just copy the symbols from the original disassembly.  
+Using the `x` command we can leak the binary: `x/20480x 0x400000`, after this (and reversing the bytes' order), we have the binary and we can load it up in our disassembler of choice, I chose Ghidra, since it's free, but ida works just as well.  
+Since we don't have any symbols, we can rename the functions and variables, which we can just copy from the original `assembly` from the integrated `disassembler`  
 However, 2 hours before the CTF ended, they just released the full binary with symbols, because there were some issues regarding speed on the online service, so I'll be using that one for now.  
 Thanks to this version, we know what the function is called: `check_rows` and we get some nice decompiled source:
-```c
+```csharp
 uint check_rows(uint blk)
 {
   uint x;
@@ -177,7 +178,8 @@ uint check_rows(uint blk)
 }
 ```
 *Here we can also see how poorly ghidra is able to understand 2d arrays..*  
-However, looking at this code, we see that there is some check whether there is a piece at the board given a location (y, x) and if there is, it's XORing `xor` with `x + 1`, it also adds `1` to the `sum` and it checks this 3 times. At the end it checks if the sum is correct and whether the `xor` value equals some constant in memory and whether the `sum` value equals another constant in memory. For this we can write a simple solver, I originally did this in `JS` so I could just copy most of the code, but here it is again in python:  
+However, looking at this code, we see that there is some check whether there is a piece at the board given a location `(y, x)` and if there is, it's XORing `xor` with `x + 1`, it also adds `1` to the `sum` and it checks this 3 times.  
+At the end it checks whether the `xor` value equals some constant in memory and whether the `sum` value equals another constant in memory. For this we can write a simple solver, I originally did this in `JS` because I could just copy most of the code, but here it is again in python:  
 
 ```python
 board = {}
@@ -252,16 +254,18 @@ X X   X X     X   X X X
 X   X X       X   X
 X   X X X X   X   X X X
 ```
-and since the check is an `OR`, we don't have to check the `sub_402637` (`check_cols`).  
-So we need to somehow get this pattern, at this point a, we let the challenge be for a like 10 hours, until the next morning, a teammember actually got this pattern by hand. And we got the flag. However, I still wanted to solve it, so I decided to puzzle a bit, as we also thought it was required for `blox2`.
+and since the check is an `OR`, we don't have to check the `sub_402637` (`check_cols`). *However `sub_402637` gives the exact same result.*  
+So we need to somehow get this pattern, at this point, I let the challenge be for like 10 hours, until the next morning, a teammember actually got this pattern by just playing the game. And we got the flag.  
+However, I still wanted to solve it, so I decided to puzzle a bit, also because we thought we need the cheatcodes for `blox2`.
 
 ### Puzzling
 Since we needed a pattern such as:  
 ![](./2.png)  
-(There are more patterns like this, but that's whatever)
-From just playing around a bit, we noticed that we get the same pieces at the start when we reset, this means that we have to break the random generator, so we go back to reversing. We also notice that in the given source, this is being called: `#define RAND_MINO() (1+rand()%NTTR_TYPES)` and at the start of main: `srand(1);` is being called, which presumably sets the inital random number to `1`?  
+*(There are more patterns like this)*  
+From just playing around a bit, we noticed that we get the same pieces at the start when we reset, this means that we have to break the random generator, so we go back to reversing.  
+We also notice that in the given source, this is being called: `#define RAND_MINO() (1+rand()%NTTR_TYPES)` and at the start of main: `srand(1);` is being called, which presumably sets the inital random number to `1`?  
 In our decompiler, the `rand` function looks something like this:
-```c
+```csharp
 int rand(void)
 {
   g_rand_state = g_rand_state * 0x41c64e6d + 0x3039U & 0x7fffffff;
@@ -269,7 +273,7 @@ int rand(void)
 }
 ```
 And `srand`:  
-```c
+```csharp
 void srand(int s)
 {
   g_rand_state = s;
