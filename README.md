@@ -1,6 +1,6 @@
 - ## 2020
     - ### CSAW Quals
-        - [blox1](2020/CSAW Quals/blox1)
+        - [blox1](2020/CSAW%20Quals/blox1)
 
     - ### r2CON
         - [radarelicensechecker](2020/r2CON/radarelicensechecker)

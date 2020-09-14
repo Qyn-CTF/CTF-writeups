@@ -1,4 +1,4 @@
-# blox1 - 84 solves (300)
+# blox1 - 84 solves (300 points)
 ## Description
 ```
 We found an old arcade machine lying around, manufactured by the RET2 Corporation. Their devs are notorious for hiding backdoors and easter eggs in their games, care to take a peek?
@@ -257,7 +257,7 @@ So we need to somehow get this pattern, at this point a, we let the challenge be
 
 ### Puzzling
 Since we needed a pattern such as:  
-![](./2.png) 
+![](./2.png)  
 (There are more patterns like this, but that's whatever)
 From just playing around a bit, we noticed that we get the same pieces at the start when we reset, this means that we have to break the random generator, so we go back to reversing. We also notice that in the given source, this is being called: `#define RAND_MINO() (1+rand()%NTTR_TYPES)` and at the start of main: `srand(1);` is being called, which presumably sets the inital random number to `1`?  
 In our decompiler, the `rand` function looks something like this:
