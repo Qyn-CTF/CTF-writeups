@@ -2,6 +2,8 @@
 ## Description
 ```
 Check out this new storage application that your government has started! It's supposed to be pretty secure since everything is authenticated...
+
+curl crypto.chal.csaw.io:5003
 ```
 
 ## First looks
