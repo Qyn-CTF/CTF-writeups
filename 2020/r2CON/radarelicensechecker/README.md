@@ -43,7 +43,7 @@ undefined8 fcn.00402c70(undefined8 dwMilliseconds)
 ```
 Let's patch that out (Right click -> edit -> instruction and allow to open in writemode) ->  
 ![](./2.png)  
-Now, the binary has been immediately patched and we just have to close cutter and open the binary again.  
+Now, the binary has been immediately patched and we have to close cutter in order to run the modified binary, since we opened it in writemode (or change the mode to readonly)  
 Trying again:
 ```
 ❯ .\radarelicensechecker.exe r2cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
