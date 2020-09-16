@@ -1,6 +1,7 @@
 - ## 2020
     - ### CSAW Quals
         - [blox1](2020/CSAW%20Quals/blox1) [REV]
+        - [blox2](2020/CSAW%20Quals/blox2) [PWN]
         - [authy](2020/CSAW%20Quals/authy) [CRYPTO]
 
     - ### r2CON
