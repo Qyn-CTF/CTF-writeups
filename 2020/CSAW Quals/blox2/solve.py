@@ -4,7 +4,7 @@ import struct
 
 currentScore = 1
 
-p = process("./bloxModified")
+p = process("./bloxModified2")
 
 def startGame():
     p.sendline("")

@@ -7,7 +7,8 @@ You proven yourself a master of Blox, now give the arcade machine a good old-fas
 ## Overview
 `blox1` has to be solved in order to solve `blox2`.  
 I didn't manage to solve the pwn part of the challenge during the CTF, but after I saw some writeups from 2 other teams, I decided to write my own, with a different solution.  
-Based on the reverse part (blox1), we were able to get cheat codes in the game, which we can use to override the original call to `hw_log` and replace the `0xbadb01` value with `0x41414141` without upgrading our `Write Primitive`. Other than that, we can override the checks that originally checked for the first flag.  
+For a bit more context, I recommend you read my other write up on [`blox1`](../blox1/) too.  
+Based on the reverse part (`blox1`), we were able to get cheat codes in the game, which we can use to override the original call to `hw_log` and replace the `0xbadb01` value with `0x41414141` without upgrading our `Write Primitive`. Other than that, we can override the checks (Just the jumps) that originally checked for the first flag.  
 
 ## Searching for Vulnerabilities
 In the given source, we can see what we have to do in order to get the second flag:
@@ -22,7 +23,7 @@ void hw_log(int reason) {
 ```
 We need to call `hw_log` with `0x41414141` as `0xbadb01` was used in the `blox1` challenge.  
 
-Since we're able to change our `tetromino` to whatever we want, however, if we do this last second, forexample change from an `I` to an `O`, we're able to write outside the `boards` array into the stuff which is located next to it, coincidentally, the `heap_top` variable is right below it:
+Since we're able to change our `tetromino` to whatever we want, we can do this last second, for example if we change from an `I` to an `O`, we're able to write outside the `boards` array into the stuff which is located next to it, coincidentally, the `heap_top` variable is right below it:
 ```csharp
 else if (cheats_enabled) {
     int idx = str_index_of(" IJLOSZT", op);
@@ -46,8 +47,8 @@ void* malloc(unsigned long n) {
     return p;
 }
 ```
-In here, we can see that if we call `malloc` with a size `n`, it *allocates* `n` bytes from the heap, starting from `heap_top`, and returning a pointer to that location. It also checks if the `heap_top` + size `n` is bigger than the actual size of the `heap`, which means that we're unable to set our `heap_top` to any value beyond the `heap`.  
-Continuing, this `malloc` function is called inside the `check_high_score` function, which checks whether there is a new high score in the top 5 and if there is, it calls `malloc` where it allows the user to enter a `3` letter name (or nothing), which is then added to the `high_score_names` array as well as the score, which is added to the `high_scores` array:
+In here, we can see that if we call `malloc` with a size `n`, it *allocates* `n` bytes from the heap and adding `n` to `heap_top`, starting from `heap_top`, and returning a pointer to that location. It also checks if the `heap_top` + size `n` is bigger than the actual size of the `heap`, which means that we're unable to set our `heap_top` to any value beyond the `heap`.  
+Continuing, this `malloc` function is called inside the `check_high_score` function, which checks whether there is a new high score in the top 5 and if there is, it calls `malloc` where it allows the user to enter a `3` letter name (or nothing), which is then added to the `high_score_names` array as well as the score, which is also added to the `high_scores` array:
 ```csharp
 bool check_high_score() {
     unsigned int idx;
@@ -110,6 +111,7 @@ Also, every mino has it's own value:
 ```
 Which means that if we get the `O` piece at the bottom left, the fourth (and third) byte of `heap_top` will be set to `04`. This means that we're just partially able to control `heap_top`, but thanks to the `malloc` function, everytime it gets called, `heap_top` is incremented by `4`.  
 
+### `cheats_enabled`
 Looking at the disassembly of the original code:
 ```asm
 0x4011d2:  mov     eax, 0x0
@@ -172,6 +174,7 @@ def die(name, score=0):
         p.send(name)
         p.sendline("")
     else:
+        #Try to optimize the code...
         rightLeft = score % 40
 
         stacksRight = int(math.floor(rightLeft / 2.0))
@@ -298,6 +301,7 @@ startGame()
 p.send(" " * 10)
 p.interactive()
 ```
-
-*Note that I patched a version of the binary, since it was rather slow with the complete output and it always timedout in the remote server*
-Now it only outputs ` IJLOSZT` when it gets a flag. (Every gameloop, when it finally finishes its routine)
+This code is not really optimized and it takes like a minute for it to get the flag.  
+*Note that I patched a version of the binary, since it was rather slow with the complete output and it always timed out in the remote server*  
+*bloxModifed* is a modified version, without any output and when `hw_log` gets called, it will output ` IJLOSZT`.  
+*bloxModified2* is the same, but in `hw_log` it compares the supplied code to `0x41414141` and only if they match it prints ` IJLOSZT`  
