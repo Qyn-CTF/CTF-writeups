@@ -303,5 +303,5 @@ p.interactive()
 ```
 This code is not really optimized and it takes like a minute for it to get the flag.  
 *Note that I patched a version of the binary, since it was rather slow with the complete output and it always timed out in the remote server*  
-*bloxModifed* is a modified version, without any output and when `hw_log` gets called, it will output ` IJLOSZT`.  
-*bloxModified2* is the same, but in `hw_log` it compares the supplied code to `0x41414141` and only if they match it prints ` IJLOSZT`  
+*bloxModifed* is a modified version, without any output and when `hw_log` gets called, it will output `IJLOSZT`.  
+*bloxModified2* is the same, but in `hw_log` it compares the supplied code to `0x41414141` and only if they match it prints `IJLOSZT`  
